@@ -1,0 +1,15 @@
+
+executable("standalone_host") {
+  sources = [
+      "src/standalone/host.cc",
+      "src/standalone/settings.cc",
+      "src/standalone/widgets.cc",
+  ]
+
+  deps = [
+      "//third_party:glad",
+      "//third_party:imgui",
+      "//third_party:glfw",
+      "//third_party:jsoncpp",
+  ]
+}

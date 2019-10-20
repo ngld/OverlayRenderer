@@ -1,0 +1,13 @@
+template("pkg_config_lib") {
+  config(target_name) {
+    _args = [ invoker.pkg ]
+    if (defined(invoker.static) && invoker.static) {
+      _args += [ "--static" ]
+    }
+
+    _pkg_data = exec_script("pkg_config_wrapper.py", _args, "json")
+
+    cflags = _pkg_data.cflags
+    ldflags = _pkg_data.libs
+  }
+}

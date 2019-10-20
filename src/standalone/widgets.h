@@ -1,0 +1,6 @@
+#ifndef OVERLAYRENDERER_STANDALONE_WIDGETS_H_
+#define OVERLAYRENDERER_STANDALONE_WIDGETS_H_
+
+void render_root_widgets();
+
+#endif

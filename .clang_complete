@@ -1,0 +1,12 @@
+-Isrc
+-Ithird_party/cef
+-Ithird_party/glfw/include
+-Ithird_party/imgui
+-Ithird_party/imgui/examples
+-Ithird_party/imgui/misc/cpp
+-Ithird_party/glad/include
+-Ithird_party/jsoncpp/include
+-Wall
+-std=c++17
+
+-DIMGUI_IMPL_OPENGL_LOADER_GLAD

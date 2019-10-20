@@ -1,0 +1,126 @@
+toolchain("clang") {
+  cc = getenv("CC")
+  cxx = getenv("CXX")
+  link = "lld-link"
+  lib = "lld-link /lib"
+
+  extra_cflags = getenv("CFLAGS")
+  extra_cxxflags = getenv("CXXFLAGS")
+  extra_ldflags = getenv("LDFLAGS")
+  sys_include_flags = ""
+  sys_lib_flags = "user32.lib shell32.lib gdi32.lib"
+
+  if (cc == "") {
+    cc = "clang-cl"
+  }
+
+  if (cxx == "") {
+    cxx = "clang-cl"
+  }
+
+  tool("cc") {
+    precompiled_header_type = "msvc"
+    pdbname = "{{target_out_dir}}/{{label_name}}_c.pdb"
+    command = "$cc /nologo /showIncludes $sys_include_flags{{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} $extra_cflags /c {{source}} /Fo{{output}} /Fd\"$pdbname\""
+    depsformat = "msvc"
+    description = "CC {{output}}"
+    outputs = [
+      "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
+    ]
+  }
+
+  tool("cxx") {
+    precompiled_header_type = "msvc"
+    pdbname = "{{target_out_dir}}/{{label_name}}_cc.pdb"
+    command = "$cxx /nologo /showIncludes $sys_include_flags{{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} $extra_cxxflags /c {{source}} /Fo{{output}} /Fd\"$pdbname\""
+    depsformat = "msvc"
+    description = "CXX {{output}}"
+    outputs = [
+      "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
+    ]
+  }
+
+  tool("alink") {
+    rspfile = "{{output}}.rsp"
+    command = "$lib /nologo ${sys_lib_flags}{{arflags}} /OUT:{{output}} @$rspfile"
+    description = "LIB {{output}}"
+    outputs = [
+      # Ignore {{output_extension}} and always use .lib, there's no reason to
+      # allow targets to override this extension on Windows.
+      "{{target_out_dir}}/{{target_output_name}}.lib",
+    ]
+    default_output_extension = ".lib"
+    default_output_dir = "{{target_out_dir}}"
+
+    # The use of inputs_newline is to work around a fixed per-line buffer
+    # size in the linker.
+    rspfile_content = "{{inputs_newline}}"
+  }
+
+  tool("solink") {
+    dllname = "{{output_dir}}/{{target_output_name}}{{output_extension}}"  # e.g. foo.dll
+    libname = "${dllname}.lib"  # e.g. foo.dll.lib
+    pdbname = "${dllname}.pdb"
+    rspfile = "${dllname}.rsp"
+
+    command = "$link /nologo ${sys_lib_flags}/IMPLIB:$libname /DLL /OUT:$dllname /PDB:$pdbname @$rspfile"
+
+    default_output_extension = ".dll"
+    default_output_dir = "{{root_out_dir}}"
+    description = "LINK(DLL) {{output}}"
+    outputs = [
+      dllname,
+      libname,
+    ]
+    link_output = libname
+    depend_output = libname
+    runtime_outputs = [ dllname ]
+    #if (symbol_level != 0) {
+      outputs += [ pdbname ]
+      runtime_outputs += [ pdbname ]
+    #}
+
+    # Since the above commands only updates the .lib file when it changes, ask
+    # Ninja to check if the timestamp actually changed to know if downstream
+    # dependencies should be recompiled.
+    restat = true
+
+    # The use of inputs_newline is to work around a fixed per-line buffer
+    # size in the linker.
+    rspfile_content = "{{libs}} {{solibs}} {{inputs_newline}} {{ldflags}}"
+  }
+
+  tool("link") {
+    exename = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
+    pdbname = "$exename.pdb"
+    rspfile = "$exename.rsp"
+
+    command = "$link /nologo ${sys_lib_flags} $extra_ldflags /OUT:$exename /PDB:$pdbname @$rspfile"
+
+    default_output_extension = ".exe"
+    default_output_dir = "{{root_out_dir}}"
+    description = "LINK {{output}}"
+    outputs = [
+      exename,
+    ]
+    #if (symbol_level != 0) {
+      outputs += [ pdbname ]
+    #}
+    runtime_outputs = outputs
+
+    # The use of inputs_newline is to work around a fixed per-line buffer
+    # size in the linker.
+    rspfile_content = "{{inputs_newline}} {{libs}} {{solibs}} {{ldflags}}"
+  }
+
+  tool("stamp") {
+    command = "cmd /c type nul > \"{{output}}\""
+    description = "STAMP {{output}}"
+  }
+
+  tool("copy") {
+    _copy_path = rebase_path("//build/toolchain/win/copy.py", root_build_dir)
+    command = "$python_path $_copy_path {{source}} {{output}}"
+    description = "COPY {{source}} {{output}}"
+  }
+}

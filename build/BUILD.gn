@@ -1,0 +1,65 @@
+declare_args() {
+  is_debug = true
+}
+
+config("compiler_defaults") {
+  cflags = [
+    "-fcolor-diagnostics",
+    "-fcf-protection",
+  ]
+  cflags_c = []
+  cflags_cc = []
+
+  if (!is_debug) {
+    cflags += [
+      "-flto",
+      "-fwhole-program-vtables",
+    ]
+  }
+
+  if (is_win) {
+    cflags_cc += [
+      "/EHsc",
+      "/std:c++17",
+      "/O2",
+    ]
+
+    if (is_debug) {
+      cflags += [
+        "/Zi"
+      ]
+    }
+  }
+
+  if (is_linux) {
+    cflags_c += [
+      "-std=c17",
+    ]
+    cflags_cc += [
+      "-std=c++17",
+    ]
+
+    cflags += [
+      "-fPIC",
+      "-pthread",
+    ]
+
+    if (is_debug) {
+      cflags += [
+        "-g",
+        "-Og",
+      ]
+    } else {
+      cflags += [ "-O2" ]
+    }
+  }
+}
+
+config("executable_ldconfig") {
+  if (is_linux) {
+    ldflags = [
+      "-Wl,-rpath=\$ORIGIN/",
+      "-Wl,-rpath-link=",
+    ]
+  }
+}
