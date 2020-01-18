@@ -1,15 +1,6 @@
-
-executable("standalone_host") {
-  sources = [
-      "src/standalone/host.cc",
-      "src/standalone/settings.cc",
-      "src/standalone/widgets.cc",
-  ]
-
+group("all") {
   deps = [
-      "//third_party:glad",
-      "//third_party:imgui",
-      "//third_party:glfw",
-      "//third_party:jsoncpp",
+    "src/cef:cef_runtime",
+    "src/standalone:standalone_host",
   ]
 }

@@ -1,0 +1,47 @@
+syntax = "proto3";
+// option optimize_for = LITE_RUNTIME;
+
+message Size {
+    uint32 width = 1;
+    uint32 height = 2;
+}
+
+enum MouseButton {
+    PKT_MB_INVALID = 0;
+    PKT_MB_LEFT = 1;
+    PKT_MB_MIDDLE = 2;
+    PKT_MB_RIGHT = 3;
+}
+
+message Packet {
+    enum Type {
+        // Host
+        FRAME = 0;
+        CHANGE_CURSOR = 7;
+
+        // Client
+        SIZE = 2;
+        JAVASCRIPT = 3;
+        URL = 4;
+        MOUSEMOVE = 5;
+        MOUSECLICK = 19;
+        MOUSESCROLL = 20;
+
+        KEYBOARD = 6;
+        INIT = 16;
+        CLEAR = 17;
+        CAPTURE_LOST = 18;
+    };
+    Type type = 1;
+
+    string name = 2;
+    string javascript = 3;    
+    bytes frame = 4;
+    Size size = 5;
+    string url = 16;
+    Size delta = 20;
+
+    MouseButton button = 17;
+    bool button_down = 19;
+    uint32 modifiers = 18;
+}

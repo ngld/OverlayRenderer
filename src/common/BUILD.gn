@@ -1,0 +1,19 @@
+import("//build/protoc.gni")
+
+source_set("common") {
+    sources = [ "win_pipe_wrapper.cc" ]
+    public_deps = [ ":packets" ]
+    deps = [ "//third_party:loguru" ]
+}
+
+source_set("cef_common") {
+    defines = [ "USE_CEF_LOGGING" ]
+    sources = [ "win_pipe_wrapper.cc" ]
+    public_deps = [ ":packets" ]
+    deps = [ "//third_party:cef" ]
+}
+
+protoc("packets") {
+    sources = [ "packets.proto" ]
+    include_dirs = [ "." ]
+}

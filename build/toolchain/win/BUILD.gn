@@ -63,7 +63,7 @@ toolchain("clang") {
     pdbname = "${dllname}.pdb"
     rspfile = "${dllname}.rsp"
 
-    command = "$link /nologo ${sys_lib_flags}/IMPLIB:$libname /DLL /OUT:$dllname /PDB:$pdbname @$rspfile"
+    command = "$link /nologo ${sys_lib_flags} /IMPLIB:$libname /DLL /OUT:$dllname /PDB:$pdbname @$rspfile"
 
     default_output_extension = ".dll"
     default_output_dir = "{{root_out_dir}}"
@@ -92,7 +92,7 @@ toolchain("clang") {
 
   tool("link") {
     exename = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
-    pdbname = "$exename.pdb"
+    pdbname = "{{output_dir}}/{{target_output_name}}.pdb"
     rspfile = "$exename.rsp"
 
     command = "$link /nologo ${sys_lib_flags} $extra_ldflags /OUT:$exename /PDB:$pdbname @$rspfile"

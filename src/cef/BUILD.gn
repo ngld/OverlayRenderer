@@ -1,0 +1,24 @@
+executable("cef_runtime") {
+    include_dirs = [ "//src" ]
+
+    defines = [
+        "BOOST_INTERPROCESS_ENABLE_TIMEOUT_WHEN_LOCKING",
+        "BOOST_INTERPROCESS_TIMEOUT_WHEN_LOCKING_DURATION_MS=600",
+    ]
+
+    sources = [
+        "browser_client.cc",
+        "browser_handler.cc",
+        "browser_life_span_handler.cc",
+        "client_app.cc",
+        "render_handler.cc",
+        "render_process_handler.cc",
+        "runtime.cpp",
+        "state_tracker.cc",
+    ]
+
+    deps = [
+        "//src/common:cef_common",
+        "//third_party:cef",
+    ]
+}

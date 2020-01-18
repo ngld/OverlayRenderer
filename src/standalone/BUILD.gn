@@ -1,0 +1,25 @@
+
+executable("standalone_host") {
+  sources = [
+    "cef_overlay.cc",
+    "host.cc",
+    "pipe_thread.cc",
+    "settings.cc",
+    "widgets.cc",
+  ]
+
+  defines = [
+    "BOOST_INTERPROCESS_ENABLE_TIMEOUT_WHEN_LOCKING",
+    "BOOST_INTERPROCESS_TIMEOUT_WHEN_LOCKING_DURATION_MS=600",
+  ]
+
+  deps = [
+    "//src/common",
+    "//third_party:boost",
+    "//third_party:glad",
+    "//third_party:glfw",
+    "//third_party:imgui",
+    "//third_party:jsoncpp",
+    "//third_party:loguru",
+  ]
+}

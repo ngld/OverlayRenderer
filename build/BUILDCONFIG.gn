@@ -1,3 +1,7 @@
+declare_args() {
+  is_debug = true
+}
+
 if (target_os == "") {
   target_os = host_os
 }
@@ -21,6 +25,12 @@ declare_args() {
 
 # All binary targets will get this list of configs by default.
 _shared_binary_target_configs = [ "//build:compiler_defaults" ]
+
+if (is_debug) {
+  _shared_binary_target_configs += [ "//build:debug"]
+} else {
+  _shared_binary_target_configs += [ "//build:release"]
+}
 
 # Apply that default list to the binary target types.
 set_defaults("executable") {

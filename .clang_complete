@@ -6,7 +6,13 @@
 -Ithird_party/imgui/misc/cpp
 -Ithird_party/glad/include
 -Ithird_party/jsoncpp/include
+-Ithird_party/loguru
+-Ithird_party/boost
+-Ithird_party/protobuf/src
+-Iout/gen/src/common
 -Wall
 -std=c++17
 
 -DIMGUI_IMPL_OPENGL_LOADER_GLAD
+-DNOMINMAX
+-DWIN32_LEAN_AND_MEAN

@@ -3,7 +3,7 @@ import os.path
 import shutil
 
 source = sys.argv[1]
-dest = sys.argv[1]
+dest = sys.argv[2]
 
 if os.path.isdir(dest):
     shutil.rmtree(dest)

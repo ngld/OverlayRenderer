@@ -37,6 +37,8 @@ bool LoadSettings() {
         overlay.y = item["y"].asInt();
         overlay.width = item["width"].asInt();
         overlay.height = item["height"].asInt();
+        overlay.visible = item.get("visible", false).asBool();
+        overlay.locked = item.get("locked", false).asBool();
     }
 
     file.close();
@@ -54,6 +56,8 @@ bool SaveSettings() {
         item["y"] = pair.second.y;
         item["width"] = pair.second.width;
         item["height"] = pair.second.height;
+        item["visible"] = pair.second.visible;
+        item["locked"] = pair.second.locked;
 
         cfg_overlays.append(item);
     }

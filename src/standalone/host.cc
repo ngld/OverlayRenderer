@@ -6,12 +6,15 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_stdlib.h>
+#include <loguru.hpp>
 
 #include "settings.h"
 #include "widgets.h"
+#include "cef_overlay.h"
+#include "pipe_thread.h"
 #include "host.h"
 
-// #include "cef/renderer_app.h"
+using namespace OverlayRenderer::Standalone;
 
 std::map<std::string, overlay_info> overlays;
 
@@ -20,8 +23,12 @@ static void glfw_error_callback(int error, const char* description) {
 }
 
 int main(int argc, char** argv) {
+    loguru::init(argc, argv);
+    loguru::add_file("host.log", loguru::Append, loguru::Verbosity_MAX);
+
     glfwSetErrorCallback(glfw_error_callback);
     
+    DLOG_F(INFO, "Initializing GLFW.");
     if (!glfwInit())
         return 1;
 
@@ -34,6 +41,7 @@ int main(int argc, char** argv) {
 
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
+    DLOG_F(INFO, "Creating window.");
     GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "OverlayRenderer Host", NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -43,12 +51,14 @@ int main(int argc, char** argv) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
+    DLOG_F(INFO, "Loading GL.");
     if (!gladLoadGL()) {
         glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
 
+    DLOG_F(INFO, "Initializing ImGui.");
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -60,12 +70,18 @@ int main(int argc, char** argv) {
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+    InitOverlayShader(glsl_version);
 
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 
+    DLOG_F(INFO, "Loading settings.");
     LoadSettings();
 
+    DLOG_F(INFO, "Starting frame receiver.");
+    StartFrameReceiver();
+
+    DLOG_F(INFO, "Entering main loop.");
     while (!glfwWindowShouldClose(window)) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

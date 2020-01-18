@@ -1,11 +1,16 @@
 #include <string>
+#include <windows.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
+#include <glad/glad.h>
+#include <loguru.hpp>
 
 #include "host.h"
 #include "settings.h"
+#include "cef_overlay.h"
 #include "widgets.h"
 
+using namespace OverlayRenderer::Standalone;
 static bool add_window_visible = false;
 
 void render_add_window() {
@@ -15,8 +20,8 @@ void render_add_window() {
     ImGui::Begin("Add Overlay");
 
     static std::string name;
+    // ImGui::SetKeyboardFocusHere();
     ImGui::InputText("Name", &name);
-    ImGui::SetItemDefaultFocus();
 
     if (ImGui::Button("OK")) {
         overlays[name].name = name;
@@ -101,37 +106,20 @@ void render_main_window() {
             ImGui::Text("No overlay selected.");
         } else {
             ImGui::Checkbox("Visible", &overlays[selected].visible);
+            ImGui::Checkbox("Locked", &overlays[selected].locked);
+
             ImGui::InputText("URL", &overlays[selected].url);
 
             ImGui::Separator();
 
             if (ImGui::Button("Save")) {
+                // TODO: Do this properly.
+                overlays[selected].url_changed = true;
                 SaveSettings();
             }
         }
 
     ImGui::EndChild();
-
-    ImGui::End();
-}
-
-void render_overlay(overlay_info &info) {
-    ImGui::SetNextWindowSize(ImVec2(info.width, info.height), ImGuiCond_Appearing);
-    ImGui::SetNextWindowPos(ImVec2(info.x, info.y), ImGuiCond_Appearing);
-
-    std::string title = "Overlay: " + info.name;
-
-    if (ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings)) {
-        ImVec2 pos = ImGui::GetWindowPos();
-        info.x = pos.x;
-        info.y = pos.y;
-
-        pos = ImGui::GetWindowSize();
-        info.width = pos.x;
-        info.height = pos.y;
-
-
-    }
 
     ImGui::End();
 }
@@ -142,7 +130,6 @@ void render_root_widgets() {
     if (add_window_visible)
         render_add_window();
 
-    for (auto &pair : overlays) {
-        render_overlay(pair.second);
-    }
+    RenderOverlays();
+    // PollOverlayMessages();
 }

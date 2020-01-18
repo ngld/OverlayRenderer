@@ -1,5 +1,32 @@
-declare_args() {
-  is_debug = true
+config("debug") {
+  if (is_win) {
+    cflags = [
+      "/Zi",
+    ]
+    ldflags = [ "-debug" ]
+  }
+
+  if (is_linux) {
+    cflags = [
+      "-g",
+      "-Og",
+    ]
+    ldflags = [ "-g" ]
+  }
+}
+
+config("release") {
+  cflags = [
+    "-flto",
+    "-fwhole-program-vtables",
+  ]
+  defines = [ "NDEBUG" ]
+
+  if (is_win) {
+    cflags += [ "/O2" ]
+  } else {
+    cflags += [ "-O2" ]
+  }
 }
 
 config("compiler_defaults") {
@@ -9,26 +36,18 @@ config("compiler_defaults") {
   ]
   cflags_c = []
   cflags_cc = []
-
-  if (!is_debug) {
-    cflags += [
-      "-flto",
-      "-fwhole-program-vtables",
-    ]
-  }
+  defines = []
 
   if (is_win) {
     cflags_cc += [
       "/EHsc",
       "/std:c++17",
-      "/O2",
     ]
 
-    if (is_debug) {
-      cflags += [
-        "/Zi"
-      ]
-    }
+    defines += [
+      "NOMINMAX",
+      "WIN32_LEAN_AND_MEAN",
+    ]
   }
 
   if (is_linux) {
@@ -43,15 +62,6 @@ config("compiler_defaults") {
       "-fPIC",
       "-pthread",
     ]
-
-    if (is_debug) {
-      cflags += [
-        "-g",
-        "-Og",
-      ]
-    } else {
-      cflags += [ "-O2" ]
-    }
   }
 }
 

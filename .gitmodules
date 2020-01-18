@@ -7,3 +7,18 @@
 [submodule "third_party/jsoncpp"]
 	path = third_party/jsoncpp
 	url = https://github.com/open-source-parsers/jsoncpp.git
+[submodule "third_party/loguru"]
+	path = third_party/loguru
+	url = https://github.com/emilk/loguru.git
+[submodule "third_party/boost_interprocess"]
+	path = third_party/boost_interprocess
+	url = https://github.com/boostorg/interprocess.git
+[submodule "third_party/boost_config"]
+	path = third_party/boost_config
+	url = https://github.com/boostorg/config.git
+[submodule "third_party/boost_date_time"]
+	path = third_party/boost_date_time
+	url = https://github.com/boostorg/date_time.git
+[submodule "third_party/protobuf"]
+	path = third_party/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git
